@@ -11,6 +11,20 @@ The skill is opinionated. It aims for lights that tell the song's story, timed t
 sound always getting the same look. It isn't for a beat-flash mapper. `SKILL.md` and `reference/case-studies.md`
 explain the approach, which was learned from one show's sequences and its owner's feedback.
 
+I've been using Opus 5.5 on xhigh effort and getting suprisingly good results.
+
+## Quickstart
+
+How I'm using this: install this to `.claude/skills/skills-xlight`. Then start a claude code session in your xlights 
+project directory.  I like to create a folder in my xlights project dir called `./newseqs` and put mp3s there that I want 
+to sequence.
+
+Then, just tell claude 
+
+> use the xlights skill to create a sequence for `./newseqs/coolsong.mp3`
+
+On the first start, it will install some dependencies.
+
 ## What's in here
 
 | Path | What |
