@@ -50,7 +50,7 @@ The user has not yet commented on v3.
 - Await the user's render feedback on v3.
 
 ## Context
-- xLights runs on the user's Mac (`/Users/jeremy/Sync/Proj/xlights/lol2026`); this Linux copy can't render. The
+- xLights runs on the user's Mac (`/Users/you/xlights/show`); this Linux copy can't render. The
   user is the only one who sees the result, so ask for visual feedback.
 - `tooling/README.md` documents the pipeline and shared design conventions. `seqs/tobymac-loc` is the reference
   for the current (2026) layout and file format.

@@ -119,7 +119,7 @@ These are unverified assumptions:
    (`heartbeat(every=...)`).
 
 ## Context
-- xLights runs on the user's Mac (`/Users/jeremy/Sync/Proj/xlights/lol2026`); this Linux copy can't render.
+- xLights runs on the user's Mac (`/Users/you/xlights/show`); this Linux copy can't render.
 - The user's favourites so far: `seqs/new/pixies` ("best work") and `seqs/new/tso_wizards`. Both use a character and
   lyric-timed literal moments. This song pushes further: the character is a light that multiplies.
 - `seqlib.meteors(perModel=True)` was added for this song (each stick gets its own meteors).

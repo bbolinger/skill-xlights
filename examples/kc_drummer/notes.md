@@ -72,5 +72,5 @@ The user hasn't given feedback on the latest version yet.
 - Await render feedback.
 
 ## Context
-- xLights runs on the user's Mac (`/Users/jeremy/Sync/Proj/xlights/lol2026`); this Linux copy can't render.
+- xLights runs on the user's Mac (`/Users/you/xlights/show`); this Linux copy can't render.
 - `tooling/README.md` documents the pipeline and shared conventions.

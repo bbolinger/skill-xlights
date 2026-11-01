@@ -50,5 +50,5 @@ after, outro).
 - The user hasn't commented on this one after the canvas rework; await render feedback.
 
 ## Context
-- xLights runs on the user's Mac (`/Users/jeremy/Sync/Proj/xlights/lol2026`); this Linux copy can't render.
+- xLights runs on the user's Mac (`/Users/you/xlights/show`); this Linux copy can't render.
 - `tooling/README.md` documents the pipeline and shared conventions.

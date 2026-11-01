@@ -111,6 +111,6 @@ The character is **the mind**, a soft pink-white light (`MIND = '#FF8CF0'`).
   `shockwave(r_start=, w_start=)`, `pinwheel(bright=)`
 
 ## Context
-- xLights runs on the user's Mac (`/Users/jeremy/Sync/Proj/xlights/lol2026`); this Linux copy can't render.
+- xLights runs on the user's Mac (`/Users/you/xlights/show`); this Linux copy can't render.
 - `tooling/README.md` documents the pipeline and shared conventions; `seqs/new/tso_wizards/notes.md` covers the
   sprite technique this song's mind light is based on.

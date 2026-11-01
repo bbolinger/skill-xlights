@@ -176,3 +176,7 @@ The examples were written for one specific yard: six free-standing vertical matr
 arches, 29 pixel sticks, spiral trees, a fence line and a manger spotlight. They use that show's model names, so
 they won't run against your layout as they are. Read them for the ideas and the effect settings, then let the
 agent write builds for your own `show_config.py`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

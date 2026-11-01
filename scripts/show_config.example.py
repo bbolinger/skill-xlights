@@ -8,7 +8,7 @@ treats a tree-trunk wrap differently from a free-standing matrix wall.
 
 # where the show folder lives on the machine that runs xLights (media and shader paths are written with it).
 # None = this folder. The lol2026 show is generated on Linux but rendered on a Mac:
-MEDIA_ROOT = '/Users/jeremy/Sync/Proj/xlights/lol2026'
+MEDIA_ROOT = '/Users/you/xlights/show'
 
 # the rows the generator writes, top to bottom in the sequencer. Groups are disjoint sets of models, so effects on
 # different rows never fight; single models only where no group covers them.
