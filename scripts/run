@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Run a tooling script with the audio environment:  ./run extract_events.py kc_drummer
+HERE="$(cd "$(dirname "$0")" && pwd)"
+CACHE="${XLIGHTS_TOOLING_CACHE:-$HOME/.cache/xlights-tooling}"
+export PYTHONDONTWRITEBYTECODE=1
+cd "$HERE" && exec "$CACHE/venvs/audio/bin/python" "$@"
