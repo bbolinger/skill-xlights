@@ -1,3 +1,6 @@
+![Skill Header](resources/xlights.png)
+
+
 # xlights-skill
 
 A [Claude Code](https://claude.com/claude-code) skill that writes xLights light-show sequences (`.xsq`) from a song.
