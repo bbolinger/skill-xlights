@@ -156,9 +156,9 @@ class Seq:
             kv['C_COLOURPICKERCTRL_SparklesColour'] = '#FFFFFF'; kv['C_SLIDER_SparkleFrequency'] = str(sparkles)
         return ','.join(f'{k}={v}' for k, v in sorted(kv.items()))
 
-    def add(self, els, layer, name, start, end, settings, colors, bright=100, sparkles=0, prio=0):
+    def add(self, els, layer, name, start, end, settings, colors, bright=100, sparkles=0, prio=0, minlen=50):
         s, e = q(start), q(end)
-        if e - s < 50: e = s + 50
+        if e - s < minlen: e = s + minlen          # minlen=25 for frame-by-frame animation
         if layer < self.nlayers - 1 and 'T_CHOICE_LayerMethod' not in settings and settings.get('_blend', 'Max'):
             settings = dict(settings, T_CHOICE_LayerMethod=settings.get('_blend', 'Max'))
         settings = {k: v for k, v in settings.items() if k != '_blend'}
@@ -170,11 +170,11 @@ class Seq:
 
     # ------------------------------------------------------------ effects
     def on(self, els, layer, start, end, color, a=100, b=100, bright=100, subbuf=None, blend='Max', perModel=False,
-           sparkles=0, prio=0):
+           sparkles=0, prio=0, minlen=50):
         st = {'E_TEXTCTRL_Eff_On_Start': a, 'E_TEXTCTRL_Eff_On_End': b, '_blend': blend}
         if subbuf: st['B_CUSTOM_SubBuffer'] = subbuf
         if perModel: st['B_CHOICE_BufferStyle'] = 'Per Model Default'
-        self.add(els, layer, 'On', start, end, st, [color], bright, sparkles, prio)
+        self.add(els, layer, 'On', start, end, st, [color], bright, sparkles, prio, minlen)
 
     def flash(self, els, layer, t, dur, color, bright=100, subbuf=None, end_level=0, perModel=False, sparkles=0, prio=0):
         self.on(els, layer, t, t + dur, color, 100, end_level, bright, subbuf, perModel=perModel, sparkles=sparkles, prio=prio)

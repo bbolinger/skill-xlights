@@ -16,7 +16,7 @@ anything - it is the user's own verdicts on their songs.
 ## Files in this skill
 | Path | What |
 |---|---|
-| `scripts/` | the toolkit, copied into `<show>/tooling/`: `setup.sh`, `separate.sh` (Demucs + Basic Pitch), `extract_events.py` (beats, hits, bars, summary), `lyrics.py` (Whisper words), `analyze_key.py`, `seqlib.py` (effect helpers + .xsq writer), `validate_xsq.py`, `timeline.py`, `layout_report.py`, `effect_examples.py`, `show_config.example.py`, `run` |
+| `scripts/` | the toolkit, copied into `<show>/tooling/`: `setup.sh`, `separate.sh` (Demucs + Basic Pitch), `extract_events.py` (beats, hits, bars, summary), `lyrics.py` (Whisper words), `analyze_key.py`, `find_motif.py` (every repeat of a riff from one example), `seqlib.py` (effect helpers + .xsq writer), `validate_xsq.py`, `timeline.py`, `layout_report.py`, `effect_examples.py`, `show_config.example.py`, `run` |
 | `templates/build_template.py` | starting point for a song's generator |
 | `examples/<song>/` | eight real generators with their handoff notes (`build.py`, `notes.md`, `summary.txt`). They use the names in `show_config.example.py` (the show they were made for) |
 | `reference/pipeline.md` | setup, commands, analysis gotchas |

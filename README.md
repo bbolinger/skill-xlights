@@ -91,7 +91,7 @@ Only the listening step needs the heavy packages. The scripts that write and che
 | Script | Needs |
 |---|---|
 | `separate.sh` | Demucs, PyTorch, Basic Pitch, soundfile, ffmpeg |
-| `extract_events.py`, `analyze_key.py` | librosa, numpy |
+| `extract_events.py`, `analyze_key.py`, `find_motif.py` | librosa, numpy |
 | `lyrics.py` | faster-whisper |
 | `timeline.py` | matplotlib |
 | `seqlib.py`, `validate_xsq.py`, song `build.py` files | Python only, plus your `show_config.py` |
@@ -162,6 +162,7 @@ cd <show>/tooling
 ./run lyrics.py mysong --model=medium.en          # word timestamps -> songs/mysong/lyrics.txt
 ./run lyrics.py mysong --model=medium.en --no-vad --prompt="a few, sung, phrases"   # if lines are missing
 ./run analyze_key.py mysong
+./run find_motif.py mysong RIFF=6.6:7.6 --notes=6     # every repeat of a riff you heard at 0:06.6
 ./run songs/mysong/build.py                       # write the sequence
 ./run validate_xsq.py ../seqs/mysong/mysong.xsq   # must report 0 problems
 ./run timeline.py ../seqs/mysong/mysong.xsq /tmp/t.png 0 60   # picture of the first minute

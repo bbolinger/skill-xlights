@@ -21,6 +21,7 @@ The mp3 goes in `seqs/<song>/` (song keys may contain a slash: `new/owl`).
 ./run extract_events.py <song>           # beats, bars, drum hits, notes -> songs/<song>/events.json + summary.txt
 ./run lyrics.py <song> --model=medium.en # Whisper word timestamps -> lyrics.json / lyrics.txt
 ./run analyze_key.py <song>              # key per 16 s window; spot modulations and minor stretches
+./run find_motif.py <song> HI=6.6:7.6 LO=9.0:10.05 --notes=6   # every repeat of a riff the user pointed at
 ```
 - `extract_events.py` fits a fixed click grid and reports drift per 20 s window. **Drift over ~60 ms = the band
   played without a click: rerun with `--loose`** (beat tracker follows the drummer; hits keep real times). Use
@@ -28,6 +29,9 @@ The mp3 goes in `seqs/<song>/` (song keys may contain a slash: `new/owl`).
 - Whisper drops lines (it lost most of a song after a silence; it found 7 lines of the Pixies song). Fix:
   `--prompt="a few phrases you know are sung, comma separated" --no-vad`. Always read `lyrics.txt`; Whisper also
   hallucinates text in silence after the song ends (ignore anything past `events.json` `end`).
+- When the user names a sound ("the da-da-da run at 0:06"), find the example in the notes CSV, then
+  `find_motif.py` with it (one NAME=t0:t1 per variant). Clean solo figures score 0.9-1.0 on repeats; under a full band
+  0.5-0.8, and chordal figures match loosely everywhere - pick those by their spot in the bar, then ask the user.
 - Don't download audio from YouTube or other sites for the user; ask them to put the file in the folder.
 - Never write full song lyrics into files you hand around; `lyrics.json` stays in `tooling/songs/<song>/`.
 

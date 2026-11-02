@@ -12,6 +12,10 @@ Every recipe below is in a real build under `examples/`. Copy the helper, then a
   instrumental may be in `other`; a lead guitar may sit in `vocals`); check `summary.txt` and the note CSVs.
 - **Hits**: `events.json` kick/snare with `kick_v/snare_v` strengths; when the bands overlap (live recordings), give
   each hit to the band it's stronger in (examples/pixies). Skip snare ghost notes closer than ~0.6 beat.
+- **Riffs**: `find_motif.py` finds every repeat of a figure from one example (examples/bdw_joy `PAIRS`: the
+  six-note keyboard run, always in pairs: six notes, six panels - a pixel ball bounces across the wall landing on each
+  note, and the second run bounces it back lower. Frame-by-frame On effects with `minlen=25`). Put a moving sprite on layers 0-1 of its model: under
+  a full-panel effect (a Twinkle) it vanishes completely.
 - **Stops / band drop-outs**: bars with kick count 0 in `summary.txt`. These are the song's punctuation.
 
 ## Characters (the biggest win)

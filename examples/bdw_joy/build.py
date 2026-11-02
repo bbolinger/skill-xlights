@@ -51,8 +51,8 @@ STICKS = sorted((m for m in LX if m.startswith('pixstk')), key=LX.get)
 ARCHS = sorted((m for m in LX if m.startswith('arch-big')), key=LX.get)
 SPIRALS = sorted(['Spiral Tree 2', 'Spiral Tree 3', 'little spiral - left', 'little spiral - right'], key=LX.get)
 VERTS_M = sorted((m for m in LX if m.startswith('Vert-')), key=LX.get)
-sq = Seq(ELEMENTS + STICKS + ARCHS + SPIRALS + VERTS_M, nlayers=34)
-# single Verts: 0-27 letters, 28-31 the crown, 32 stars on the outer panels
+sq = Seq(ELEMENTS + STICKS + ARCHS + SPIRALS + VERTS_M, nlayers=36)
+# single Verts: 0-1 the bouncing ball (a character: on top), 2-29 letters, 30-33 the crown, 34 stars on the outer panels
 # Verts group: 0 the herald/star, 1 angels / gold fill, 2 stars, 3 sweeps, 4 background
 _x = [LX[m] for m in ARCHS + STICKS + SPIRALS + VERTS_M]
 ALLX = lambda x: (x - min(_x)) / (max(_x) - min(_x)) * 100
@@ -149,7 +149,7 @@ def cell(c1, c2, row_lo, row_hi):
     below pixel boundaries"""
     return sub(c1 * 100 / 6 - 0.01, row_lo * 100 / 44 - 0.01, (c2 + 1) * 100 / 6 - 0.01, (row_hi + 1) * 100 / 44 - 0.01)
 
-def draw(k, bitmaps, t0, t1, colors, layer0=0, top=None, fade=0.25):
+def draw(k, bitmaps, t0, t1, colors, layer0=2, top=None, fade=0.25):
     """draw bitmaps (letters) stacked top to bottom on Vert k, centred unless `top` (row of the top edge) is given"""
     n = len(bitmaps)
     total = sum(len(b) for b in bitmaps) + GAP * (n - 1)
@@ -174,7 +174,7 @@ def spell(k, text, t0, t1, colors):
 
 def crowns(t0, t1, top=None, ks=range(6), color=GOLD):
     for k in ks:
-        draw(k, [CROWN], t0, t1, [color], layer0=28, top=top, fade=0.4)
+        draw(k, [CROWN], t0, t1, [color], layer0=30, top=top, fade=0.4)
 
 # ---------------------------------------------------------------- helpers
 def breathe(s0, s1, cols_, lo=30, hi=100, els=HOUSE + ['grinch-1'], layer=1):
@@ -250,6 +250,61 @@ for grp, hits, vals in (('pix-evens', KICKS, kv), ('pix-odds', SNARES, sv)):
         c = RAINBOW[j % 6] if section(t) in ('joy', 'final') else [RED, GREEN][j % 2]
         sq.bounce(grp, 1, t, t + d, [rich(c)], height=40 + 60 * min(max(vals[t] - 0.35, 0) / 0.6, 1))
 
+# ================================================================ the "da-da-da-da-da-da" runs: a bouncing ball
+# The six-note keyboard run always comes in pairs (higher, then a little lower). Found with find_motif.py from the
+# intro pair the user pointed at (0:06.7 / 0:09.0): HI/LO in the intro, UP is the chorus figure. Six notes, six
+# panels: on the first run a ball drops onto the left panel and bounces across the wall, one landing per note; it
+# rests on the last panel, and the second run bounces it back, lower. Each landing thumps the fence below. It crosses
+# the words for a moment - it's small and quick.
+MOTIFS = json.load(open(HERE / 'motifs.json'))
+PAIRS = []
+for m in MOTIFS:
+    if m['name'] == 'HI' and m['score'] >= 0.5 and m['t'] < SPAN['intro'][1]:
+        lo = [k for k in MOTIFS if k['name'] == 'LO' and 0 < k['t'] - m['notes'][-1] < 3.0]
+        if lo: PAIRS.append((m['notes'], lo[0]['notes']))
+for n in range(1, int((END - B1) / BAR) + 1):
+    if n % 2 or kind(B(n)) not in ('chorus', 'final'): continue
+    near = lambda off: max((k for k in MOTIFS if k['name'] == 'UP' and abs(k['t'] - B(n) - off) < 0.2),
+                           key=lambda k: k['score'], default=None)
+    a, b = near(1.0), near(2.27)                 # beat 2.6 and beat 4.6 of the even bars
+    if a and b and min(a['score'], b['score']) >= 0.6: PAIRS.append((a['notes'], b['notes']))
+PAIRS.sort()
+
+ICE = '#00E5FF'                                 # the ball's own colour: nothing else in the show is icy cyan
+_fx = lambda x: (x - LX['fenceline']) / 2825 * 100                  # world X -> % along the fence
+FRAME = 0.025
+
+def ball_at(k, t0, t1, y, color, a=100, b=100):
+    """a 4x4 round pixel ball on Vert k with its bottom at row y (layers 0-1: on top of the words and stars)"""
+    y = max(0, min(int(y), 40))
+    sq.on(VERTS_M[k], 0, t0, t1, color, a, b, subbuf=cell(1, 4, y + 1, y + 2), minlen=25)
+    sq.on(VERTS_M[k], 1, t0, t1, color, a, b, subbuf=cell(2, 3, y, y + 3), minlen=25)
+
+def ball_run(notes, panels, h, color, drop_in):
+    """one landing per note on panels[i]; between landings the ball arcs up h rows and over to the next panel.
+    drop_in: it falls into the first panel from above (else the first note is the take-off from where it rests)"""
+    for i, (n, k) in enumerate(zip(notes, panels)):
+        a_in = (n - notes[i - 1]) / 2 if i else (notes[1] - notes[0]) / 2
+        a_out = (notes[i + 1] - n) / 2 if i + 1 < len(notes) else 0.12
+        f = round((n - a_in if (i or drop_in) else n) / FRAME)          # frames on the 25 ms grid
+        hop = h if i + 1 < len(notes) else h / 3                          # the last landing: one small bounce
+        while f * FRAME < n + a_out - 1e-6:
+            t = f * FRAME
+            a, ht = (a_in, h) if t < n else (a_out, hop)
+            ball_at(k, t, t + FRAME, round(ht * min(((t + FRAME / 2 - n) / a) ** 2, 1)), color)
+            f += 1
+        fx = _fx(LX[VERTS_M[k]]) + 1.2                             # the landing thumps the fence below
+        sq.flash('fenceline', 4, n, 0.3, color, subbuf=sub(max(fx - 2.5, 0), 0, min(fx + 2.5, 100), 100))
+    return f * FRAME                                                      # where the last frame ends
+
+for j, (wind, unwind) in enumerate(PAIRS):
+    c = RAINBOW[j % 6] if section(wind[0]) == 'final' else ICE
+    t = ball_run(wind, range(6), 22, c, True)                     # the higher run bounces higher, left to right
+    ball_at(5, t, unwind[0], 0, c, 85, 60)                        # resting on the last panel
+    t = ball_run(unwind, range(5, -1, -1), 13, c, False)          # the lower run comes back lower
+    ball_at(0, t, t + 0.6, 0, c, 85, 0)                           # and fades where it started
+    STORY.append(('da-da-da: the ball bounces across the wall and back', wind[0], t + 0.6))
+
 # ================================================================ backgrounds
 for name, (s0, s1) in SPAN.items():
     k = kind(s0)
@@ -261,8 +316,8 @@ for name, (s0, s1) in SPAN.items():
         sq.spirals('trees', 1, s0, s1, [RED, WHITE] if k != 'final' else [RED, WHITE, GREEN], count=2, rotation=25,
                    thickness=40, movement=2.0, bright=80, perModel=True)          # candy-cane trunks
         breathe(s0, s1, [RED, GREEN] if k != 'final' else RAINBOW)
-        sq.twinkle(VERTS_M[0], 32, s0, s1, [GOLD, RED, GREEN], count=35, steps=20, bright=100)  # stars beside the sign
-        sq.twinkle(VERTS_M[5], 32, s0, s1, [GOLD, GREEN, RED], count=35, steps=20, bright=100)
+        sq.twinkle(VERTS_M[0], 34, s0, s1, [GOLD, RED, GREEN], count=35, steps=20, bright=100)  # stars beside the sign
+        sq.twinkle(VERTS_M[5], 34, s0, s1, [GOLD, GREEN, RED], count=35, steps=20, bright=100)
         if k != 'intro':
             j = 0
             while s0 + j * BAR < s1 - 0.1:
@@ -381,7 +436,7 @@ STORY.append(('see the shepherds bowing down', a, RESPONSES[1]))
 # "wise men offer Him their crown": a crown carried panel to panel toward the manger
 a = calls[1]
 for k in range(6):
-    draw(k, [CROWN], a + k * 0.38, a + k * 0.38 + 0.6, [GOLD], layer0=28, top=12, fade=0.3)
+    draw(k, [CROWN], a + k * 0.38, a + k * 0.38 + 0.6, [GOLD], layer0=30, top=12, fade=0.3)
 sq.flash(NAT, 0, a + 6 * 0.38, 1.2, GOLD, end_level=60)
 STORY.append(('wise men offer Him their crown', a, RESPONSES[2]))
 # "then till now and far beyond": a light runs the whole fence and off the end
@@ -457,6 +512,8 @@ sq.tracks = [
     ('Lyrics', marks([s for w, s, e in WORDS], [w for w, s, e in WORDS], maxlen=1.2)),
     ('Bars', marks([B(n) for n in range(1, nbars + 1)], [str(n) for n in range(1, nbars + 1)], end=END)),
     ('Beats', marks(BEATS, [str((i - ev['phase']) % 4 + 1) for i in range(len(BEATS))], end=END)),
+    ('Runs', marks([n for w, u in PAIRS for n in (w[0], u[0])], [lab for _ in PAIRS for lab in ('ball right', 'ball back')],
+                   maxlen=1.0)),
     ('Kick', marks(KICKS, maxlen=PER / 2)), ('Snare', marks(SNARES, maxlen=PER / 2)),
     ('Vocal Notes', marks([t for t, p, d in MELODY], [str(p) for t, p, d in MELODY], maxlen=PER)),
 ]
