@@ -48,8 +48,43 @@ analyze_key.py to write the `SECTIONS` table.
 ./run timeline.py ../seqs/<song>/<name>.xsq /tmp/a.png 0 60   # picture of every row/layer; look at it
 ```
 Also print the Story timing track (labels + times) and read it against the lyrics - it catches mistimed moments
-faster than anything. Things xLights would show but these checks can't: whether a motif *reads*. List those for the
-user as "things to check when you render".
+faster than anything. Things xLights would show but these checks can't: whether a motif *reads*. If xLights is
+reachable, look yourself (next section); otherwise list those for the user as "things to check when you render".
+
+## Render, save, read back (optional: xLights 2026.17+ with its API port on)
+Everything above checks the XML. This step checks the RENDER: `xl.py` drives the running xLights through its
+automation API, saves (the save is what writes the `.fseq`), and `snap.py` decodes the saved frames at a model's
+exact channels and draws the prop as it was lit.
+```sh
+./run xl.py status                                    # which show folder xLights has loaded, what is open
+./run xl.py open ../seqs/<song>/<name>.xsq            # refuses while xLights has another show folder loaded
+./run xl.py render                                    # ONE renderAll; nothing may touch the sequence meanwhile
+./run xl.py save                                      # writes the .fseq and waits until it stops growing
+./run snap.py --fseq ../seqs/<song>/<name>.fseq --model <Model> --at 1:02.5                    # a still of one prop
+./run snap.py --fseq ../seqs/<song>/<name>.fseq --model <Model> --strip 1:02..1:04 --step 0.1  # a contact sheet
+./run xl.py close                                     # refuses while <name>.xbkp is newer than the .xsq
+```
+Setup, once, in xLights: Preferences -> Output -> API Port -> Port A (49913), and GPU rendering OFF (the Metal
+shader effects hung the machine under automation). From another machine set `XLIGHTS_HOST=<the xLights machine>`:
+xLights binds the port on all interfaces, so only that machine's firewall is in the way; `xl.py` maps paths through
+`MEDIA_ROOT` the way the media paths already are, and reads the `.fseq` from this machine's copy of the show folder
+once it has synced.
+
+Rules, each paid for with a crash or an evening on the show this came from; `xl.py` enforces them:
+- One render at a time, and nothing touches the sequence while it runs (a lock file). Churn under a live render is
+  what reset the GPU, not the render itself.
+- A render does not write the `.fseq`; a save does, and the API returns before the write is finished. Read the file
+  only after `save` reports it settled.
+- `save` before `close`: xLights holds the user's unsaved edits in memory and a close throws them away. Autosave
+  goes to `<name>.xbkp`, never the `.xsq`; look there when work is missing.
+- The loaded show folder is part of a sequence's identity: `xl.py` refuses to open, render or save while xLights has
+  another show loaded, because that can write every model the other layout lacks out of the file.
+- `snap.py` refuses to read past the next model's start channel (a wrong geometry would quietly read the neighbour)
+  and draws exactly the frame you ask for. Sample strictly inside an effect's span: a boundary frame still holds the
+  neighbour's last frame.
+
+What it buys: whether a motif reads, whether the right prop lit, and what colour actually came out, settled from the
+file instead of from the user's description. The user's eye still has the last word; it just starts later.
 
 The builder keeps a hash of each file it wrote in `.build_hashes.json` and refuses to overwrite a sequence that
 changed since (the user edited it in xLights). Back it up or ask before `--force`. To test without touching the real

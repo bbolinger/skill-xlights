@@ -7,7 +7,9 @@ description: Design and generate xLights Christmas/holiday light-show sequences 
 
 You are building a light show for a person who will watch it on their own house. You cannot see the result:
 xLights renders it on their machine. So you listen to the song with tools, design deliberately, write the design
-down, generate the sequence with code, check it every way you can without eyes, and ask them what it looks like.
+down, generate the sequence with code, check it every way you can without eyes, and ask them what it looks like. When xLights is reachable from where you
+run (the same machine, or over the LAN with `XLIGHTS_HOST`), `xl.py` and `snap.py` let you render, save and look at
+the actual frames first (`reference/pipeline.md`, "Render, save, read back"); the user's eye still has the last word.
 
 What made the user's favourites great was never the effect count. It was **a story the lights tell, timed to the
 words, with every signature sound given one consistent look.** Read `reference/case-studies.md` before designing
@@ -16,7 +18,7 @@ anything - it is the user's own verdicts on their songs.
 ## Files in this skill
 | Path | What |
 |---|---|
-| `scripts/` | the toolkit, copied into `<show>/tooling/`: `setup.sh`, `separate.sh` (Demucs + Basic Pitch), `extract_events.py` (beats, hits, bars, summary), `lyrics.py` (Whisper words), `analyze_key.py`, `find_motif.py` (every repeat of a riff from one example), `seqlib.py` (effect helpers + .xsq writer), `validate_xsq.py`, `timeline.py`, `layout_report.py`, `effect_examples.py`, `show_config.example.py`, `run` |
+| `scripts/` | the toolkit, copied into `<show>/tooling/`: `setup.sh`, `separate.sh` (Demucs + Basic Pitch), `extract_events.py` (beats, hits, bars, summary), `lyrics.py` (Whisper words), `analyze_key.py`, `find_motif.py` (every repeat of a riff from one example), `seqlib.py` (effect helpers + .xsq writer), `validate_xsq.py`, `timeline.py`, `layout_report.py`, `effect_examples.py`, `xl.py` (drive xLights: open, render, save, close), `fseq.py` + `layout.py` (decode a saved render at a model's channels), `snap.py` (a still of one prop from the render), `show_config.example.py`, `run` |
 | `templates/build_template.py` | starting point for a song's generator |
 | `examples/<song>/` | eight real generators with their handoff notes (`build.py`, `notes.md`, `summary.txt`). They use the names in `show_config.example.py` (the show they were made for) |
 | `reference/pipeline.md` | setup, commands, analysis gotchas |
@@ -59,7 +61,8 @@ anything - it is the user's own verdicts on their songs.
 4. **Build** `tooling/songs/<song>/build.py` from the template or the nearest example. Anchor everything to bars,
    beats, hits, notes and words from the analysis - never hand-typed seconds.
 5. **Check.** `validate_xsq.py` must say 0 problems. Draw `timeline.py` images and look at them. Print the Story
-   track against the lyrics. Rebuild every other song afterwards if you touched `seqlib.py` (they should come out
+   track against the lyrics. If xLights is reachable (`./run xl.py status`), open, render and save through it, then
+   `snap.py` the props that carry the story at the moments that matter, and fix what you see before handing off. Rebuild every other song afterwards if you touched `seqlib.py` (they should come out
    byte-identical) - other sequences depend on it.
 6. **Hand off.** Write `seqs/<song>/notes.md` (the song, sections, concept, files, rebuild command, and the list of
    things you couldn't verify), then tell the user in plain words what they'll see, moment by moment, and what to
